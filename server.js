@@ -173,6 +173,12 @@ server.on('request', (req, res) => {
         return req.url.split('?')[0];
     }());
 
+    // http://localhost:7777/pdf-generator-check
+    if (pathname === '/pdf-generator-check') {
+
+        return res.end('ok');
+    }
+
     if (pathname === '/favicon.ico') {
 
         return res.end('no favicon');

@@ -22,7 +22,8 @@ const puppeteer = require('puppeteer');
             '--no-sandbox',
             '--disable-setuid-sandbox'
         ],
-        executablePath: '/usr/bin/chromium-browser'
+        executablePath: '/usr/bin/chromium-browser',
+        timeout: 20000
     });
 
     const page = await browser.newPage();
