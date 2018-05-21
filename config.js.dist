@@ -1,0 +1,7 @@
+
+module.exports = {
+    basicAuth: {
+        name: 'admin',
+        password: 'password'
+    }
+}

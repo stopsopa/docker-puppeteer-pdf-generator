@@ -7,7 +7,34 @@
 
 // const ll = require('../../react/webpack/logn');
 
-const shelljs = require('shelljs');
+const shelljs   = require('shelljs');
+
+const config    = require('./config');
+
+(function () {
+    let error = false;
+    try {
+
+        if (!config.basicAuth.name) {
+            error = `something is wrong with name in config.js`;
+        }
+
+        if (!config.basicAuth.password) {
+            error = `something is wrong with password in config.js`;
+        }
+    }
+    catch (e) {
+        error = `something is wrong with config.js`;
+    }
+
+    if (error) {
+
+        process.stderr.write();
+        process.exit(1);
+    }
+}());
+
+const auth      = require('basic-auth');
 
 var log = (function(){try{return console.log}catch(e){return function(){}}}());
 
@@ -141,6 +168,15 @@ const html =  fs.readFileSync('./form.html').toString();
 let purl = false;
 
 server.on('request', (req, res) => {
+
+    var credentials = auth(req)
+
+    if (!credentials || credentials.name !== config.basicAuth.name || credentials.pass !== config.basicAuth.password) {
+
+        res.statusCode = 401;
+        res.setHeader('WWW-Authenticate', 'Basic realm="User and password please"')
+        return res.end('Access denied');
+    }
 
     const jsonResponse = json => {
 
