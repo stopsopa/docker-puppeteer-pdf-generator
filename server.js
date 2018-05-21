@@ -120,7 +120,21 @@ port = parseInt(port, 10);
 
 const http        = require('http');
 
-const server    = http.createServer().listen(port);
+const server    = http.createServer()
+
+server.on('error', (e) => {
+    if (e.code === 'EADDRINUSE') {
+        console.log('Address in use, retrying...');
+        setTimeout(() => {
+            server.close();
+            server.listen(PORT, HOST);
+        }, 1000);
+    }
+});
+
+server.listen(port, e => {
+    tlog(`\n\n    server is listening on port ${port}\n\n`)
+});
 
 const html =  fs.readFileSync('./form.html').toString();
 
@@ -196,6 +210,8 @@ server.on('request', (req, res) => {
 
             return res.end(html);
         }
+
+        tlog(`generating pdf from page: ${purl}`);
 
         if ( ! /^https?:\/\/.+/.test(purl) ) {
 
