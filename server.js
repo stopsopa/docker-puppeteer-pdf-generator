@@ -169,6 +169,15 @@ let purl = false;
 
 server.on('request', (req, res) => {
 
+    const pathname = (function () {
+        return req.url.split('?')[0];
+    }());
+
+    if (pathname === '/favicon.ico') {
+
+        return res.end('no favicon');
+    }
+
     var credentials = auth(req)
 
     if (!credentials || credentials.name !== config.basicAuth.name || credentials.pass !== config.basicAuth.password) {
@@ -188,12 +197,7 @@ server.on('request', (req, res) => {
         return res.end(JSON.stringify(json, null, 4));
     }
 
-    const pathname = (function () {
-        return req.url.split('?')[0];
-    }());
-
-    log("\n");
-    tlog(`request: `, req.url);
+    log(`\n    vv new request vv ` + req.url);
 
     if (pathname !== '/generate') {
 
@@ -278,8 +282,6 @@ server.on('request', (req, res) => {
             });
         }
 
-        tlog('continue...');
-
         if (sel.code != 0) {
 
             tlog('process returne dcode: ' + file)
@@ -295,7 +297,7 @@ server.on('request', (req, res) => {
 
         if (fs.existsSync(file)) {
 
-            tlog('attempt to return file: ' + file)
+            tlog('attempt to return file: ' + file + ' from server');
 
             const stream = fs.createReadStream(file);
             const stat = fs.statSync(file);

@@ -41,7 +41,7 @@ URLMATCH="^https?://.*"
 
 if [[ $URL =~ $URLMATCH ]]; then
 
-    echo "$URL is valid url";
+    true
 else
 
     echo "$URL is not valid url";
@@ -49,7 +49,20 @@ else
     exit 1;
 fi
 
-docker build -t $DOCKERIMAGE .
+export SCRIPT=$(cat <<END
+docker build -t $DOCKERIMAGE . 2>&1
+END
+);
+
+set +e
+OUTPUT=$(eval $SCRIPT 2>&1);
+STATUS="$?"
+set -e
+
+if [ "$STATUS" != "0" ]; then
+
+    echo -e "for url: 'build process failed code:$STATUS\nstdout:>>>>$OUTPUT<<<\n\n"
+fi
 
 rm -rf $TMPFILE;
 
@@ -83,5 +96,5 @@ if [ ! -f $TMPFILE ]; then
     exit 1
 fi
 
-echo -e "file '$TMPFILE' generated for url '$URL'\n----------------------------";
+echo -e "$(date +"%Y-%m-%d %H:%M:%S"): file '$TMPFILE' generated for url '$URL' - script didn't crashed";
 
