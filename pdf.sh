@@ -37,10 +37,23 @@ if [ ! $# -lt 2 ] ; then
     TMPFILE="$2"
 fi
 
+URLMATCH="^https?://.*"
+
+if [[ $URL =~ $URLMATCH ]]; then
+
+    echo "$URL is valid url";
+else
+
+    echo "$URL is not valid url";
+
+    exit 1;
+fi
+
 docker build -t $DOCKERIMAGE .
 
 rm -rf $TMPFILE;
 
+export SCRIPT=$(cat <<END
 docker run \
     --env P_URL="$URL" \
     --env P_TMPFILE="$TMPFILE" \
@@ -49,12 +62,26 @@ docker run \
     --cap-add=SYS_ADMIN \
     -v $(pwd):/app/app \
     $DOCKERIMAGE \
-    node -e "$(cat script.js)"
+    node -e "\$(cat script.js)" 2>&1
+END
+);
+
+set +e
+OUTPUT=$(eval $SCRIPT 2>&1);
+STATUS="$?"
+set -e
+
+if [ "$STATUS" != "0" ]; then
+
+    echo -e "for url: '$URL' receive process code != 0\nprocess code:$STATUS\nstdout:>>>>$OUTPUT<<<\n\n"
+fi
 
 if [ ! -f $TMPFILE ]; then
 
-    echo "file '$TMPFILE' doesn't exist"
+    echo "file '$TMPFILE' was not created for url '$URL'"
     
     exit 1
 fi
+
+echo -e "file '$TMPFILE' generated for url '$URL'\n----------------------------";
 
