@@ -62,9 +62,12 @@ const timeout = 15000;
 
         await page.goto(process.env.P_URL, {waitUntil: 'networkidle2'});
 
+        // https://github.com/GoogleChrome/puppeteer/issues/666#issuecomment-326796411
         await page.pdf({
             path: '/app/app/' + process.env.P_TMPFILE,
-            format: 'letter'
+            printBackground: true,
+            format: 'A4',
+            margin: { top: 0, right: 0, bottom: 0, left: 0 }
         });
 
         browser.close();
