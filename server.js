@@ -167,21 +167,31 @@ const html =  fs.readFileSync('./form.html').toString();
 
 let purl = false;
 
-server.on('request', (req, res) => {
+const handler = (req, res, next) => {
 
     const pathname = (function () {
         return req.url.split('?')[0];
     }());
 
     // http://localhost:7777/pdf-generator-check
+    if (pathname === '/infinity') {
+
+        return next();
+    }
+
+    // http://localhost:7777/pdf-generator-check
     if (pathname === '/pdf-generator-check') {
 
-        return res.end('ok');
+        res.end('ok');
+
+        return next();
     }
 
     if (pathname === '/favicon.ico') {
 
-        return res.end('no favicon');
+        res.end('no favicon');
+
+        return next();
     }
 
     var credentials = auth(req)
@@ -190,7 +200,9 @@ server.on('request', (req, res) => {
 
         res.statusCode = 401;
         res.setHeader('WWW-Authenticate', 'Basic realm="User and password please"')
-        return res.end('Access denied');
+        res.end('Access denied');
+
+        return next();
     }
 
     const jsonResponse = json => {
@@ -200,7 +212,9 @@ server.on('request', (req, res) => {
             res.statusCode = 500;
         }
 
-        return res.end(JSON.stringify(json, null, 4));
+        res.end(JSON.stringify(json, null, 4));
+
+        return next();
     }
 
     log(`\n    vv new request vv ` + req.url);
@@ -209,7 +223,9 @@ server.on('request', (req, res) => {
 
         res.setHeader('Content-type', 'text/html; charset=UTF-8');
 
-        return res.end(`The only endpoint handled is <a href="/generate">/generate</a>`);
+        res.end(`The only endpoint handled is <a href="/generate">/generate</a>`);
+
+        return next();
     }
     // purl = false;
 
@@ -254,7 +270,9 @@ server.on('request', (req, res) => {
 
             purl = false;
 
-            return res.end(html);
+            res.end(html);
+
+            return next();
         }
 
         tlog(`generating pdf from page: ${purl}`);
@@ -314,6 +332,10 @@ server.on('request', (req, res) => {
             // res.setHeader('Content-Disposition', 'attachment; filename=quote.pdf');
 
             stream.pipe(res);
+
+            purl = false;
+
+            return setTimeout(next, 0);
         }
         else {
 
@@ -332,5 +354,40 @@ server.on('request', (req, res) => {
     }
 
     purl = false;
-});
+};
+
+const queue = function (handler) {
+
+    const queue = [];
+
+    let pending = false;
+
+    const trigger = () => {
+
+        if ( ! pending && queue.length ) {
+
+            pending = true;
+
+            handler(...queue.shift(), () => setTimeout(() => {
+                pending = false;
+                trigger();
+            }, 0));
+        }
+    }
+
+    const tool = (...args) => {
+
+        queue.push([...args]);
+
+        trigger();
+    }
+
+    tool.count = () => queue.length;
+
+    return tool;
+}
+
+const q = queue(handler);
+
+server.on('request', (req, res) => q(req, res));
 

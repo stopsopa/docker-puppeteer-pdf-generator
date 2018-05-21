@@ -15,6 +15,8 @@ if ( ! process.env.P_TMPFILE) {
 
 const puppeteer = require('puppeteer');
 
+const timeout = 15000;
+
 (async() => {
 
     const browser = await puppeteer.launch({
@@ -23,18 +25,57 @@ const puppeteer = require('puppeteer');
             '--disable-setuid-sandbox'
         ],
         executablePath: '/usr/bin/chromium-browser',
-        timeout: 20000
+        timeout
     });
 
-    const page = await browser.newPage();
+    try {
 
-    await page.goto(process.env.P_URL, {waitUntil: 'networkidle2'});
+        const page = await browser.newPage();
 
-    await page.pdf({
-        path: '/app/app/' + process.env.P_TMPFILE,
-        format: 'letter'
-    });
+        page.setDefaultNavigationTimeout(timeout);
 
-    browser.close();
+        page.on('error', msg => {
+
+            process.stdout.write(`error: ` + JSON.stringify(msg));
+
+            browser.close();
+
+            process.exit(1);
+        });
+        page.on('pageerror', msg => {
+
+            process.stdout.write(`pageerror: ` + JSON.stringify(msg));
+
+            browser.close();
+
+            process.exit(1);
+        });
+
+        process.on("unhandledRejection", (reason, p) => {
+
+            process.stdout.write("unhandledRejection: Unhandled Rejection at: Promise" + JSON.stringify(p) + "reason:" + JSON.stringify(reason));
+
+            browser.close();
+
+            process.exit(1);
+        });
+
+        await page.goto(process.env.P_URL, {waitUntil: 'networkidle2'});
+
+        await page.pdf({
+            path: '/app/app/' + process.env.P_TMPFILE,
+            format: 'letter'
+        });
+
+        browser.close();
+    }
+    catch (e) {
+
+        process.stdout.write(`puppeteer catch: ` + JSON.stringify(e.message));
+
+        browser.close();
+
+        process.exit(1);
+    }
 
 })();

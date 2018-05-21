@@ -62,6 +62,8 @@ set -e
 if [ "$STATUS" != "0" ]; then
 
     echo -e "for url: 'build process failed code:$STATUS\nstdout:>>>>$OUTPUT<<<\n\n"
+
+    exit 1
 fi
 
 rm -rf $TMPFILE;
@@ -87,6 +89,8 @@ set -e
 if [ "$STATUS" != "0" ]; then
 
     echo -e "for url: '$URL' receive process code != 0\nprocess code:$STATUS\nstdout:>>>>$OUTPUT<<<\n\n"
+
+    exit 1
 fi
 
 if [ ! -f $TMPFILE ]; then

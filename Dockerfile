@@ -14,7 +14,7 @@ WORKDIR /app
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 # Puppeteer v0.13.0 works with Chromium 64.
-RUN yarn add puppeteer@0.13.0
+RUN yarn add puppeteer@1.4.0
 
 # Add user so we don't need --no-sandbox.
 RUN addgroup -S pptruser && adduser -S -g pptruser pptruser \
