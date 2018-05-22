@@ -212,6 +212,8 @@ const handler = (req, res, next) => {
             res.statusCode = 500;
         }
 
+        res.setHeader('Content-type', 'application/json; charset=utf-8');
+
         res.end(JSON.stringify(json, null, 4));
 
         return next();
