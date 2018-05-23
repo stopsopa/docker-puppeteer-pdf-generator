@@ -67,7 +67,8 @@ const timeout = 15000;
             path: '/app/app/' + process.env.P_TMPFILE,
             printBackground: true,
             format: 'A4',
-            margin: { top: 0, right: 0, bottom: 0, left: 0 }
+            margin: { top: 0, right: 0, bottom: 0, left: 0 },
+            scale: 0.7
         });
 
         browser.close();
