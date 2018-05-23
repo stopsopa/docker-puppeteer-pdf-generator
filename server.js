@@ -194,7 +194,7 @@ const handler = (req, res, next) => {
         return next();
     }
 
-    var credentials = auth(req)
+    var credentials = auth(req);
 
     if (!credentials || credentials.name !== config.basicAuth.name || credentials.pass !== config.basicAuth.password) {
 
@@ -290,27 +290,29 @@ const handler = (req, res, next) => {
             });
         }
 
+        const cmd = `/bin/bash pdf.sh "${purl}"`;
+
         try {
 
-            sel = shelljs.exec(`/bin/bash pdf.sh "${purl}"`);
+            sel = shelljs.exec(cmd);
         }
         catch (e) {
 
             tlog('exception:');
 
-            // ll(e);
-
             purl = false;
 
             return jsonResponse({
                 error: 'innerCatch',
-                exception: e
+                exception: e.toString()
             });
         }
 
+        const file = path.join(__dirname, 'pdf.pdf');
+
         if (sel.code != 0) {
 
-            tlog('process returne dcode: ' + file)
+            tlog(`executing command '${cmd}' failed, exit code: '${sel.code}'`)
 
             purl = false;
 
@@ -318,8 +320,6 @@ const handler = (req, res, next) => {
                 error: `processing url '${query.url}' failed`
             });
         }
-
-        const file = path.join(__dirname, 'pdf.pdf');
 
         if (fs.existsSync(file)) {
 
@@ -350,7 +350,7 @@ const handler = (req, res, next) => {
     catch (e) {
 
         jsonResponse({
-            error: e,
+            error: e.toString(),
             status: sel.status
         });
     }
