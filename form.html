@@ -8,12 +8,143 @@
     <title>Pdf generator</title>
 </head>
 <body>
-    <form action="/generate" method="get">
-        <label>
-            <input type="text" name="url" style="width:98%">
-        </label>
-        <br>
-        <input type="submit" value="generate pdf">
-    </form>
+    <div id="root"></div>
+    <!--<script src="https://unpkg.com/react@16/umd/react.development.js"></script>-->
+    <!--<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>-->
+    <!--<script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>-->
+    <script src="./js/react.development.js"></script>
+    <script src="./js/react-dom.development.js"></script>
+    <script src="./js/babel.min.js"></script>
+
+    <script type="json"></script>
+    <script type="text/babel">
+
+        const log=(function(){try{return console.log}catch(e){return function(){}}}());
+
+        const config = JSON.parse(document.querySelector('script[type="json"]').innerHTML);
+
+        log('config', config);
+
+        const {
+            Fragment
+        } = React;
+
+        class Root extends React.Component {
+            constructor(...args) {
+
+                super(...args);
+
+                this.state = config;
+
+                // log('state', this.state);
+            }
+            onSubmit = (e, ...args) => {
+
+                e.preventDefault();
+
+                this.setState(prevState => ({...prevState}), () => this.form.submit())
+            }
+            change = (key, value) => new Promise((resolve, reject) => this.setState((prevState, props) => {
+
+                // log('key', key)
+                // log('value', value)
+                // log('before', prevState)
+
+                const newState = {...prevState};
+
+                if (typeof key !== 'string') {
+
+                    log('not string, but why?');
+
+                    newState.test = 'true';
+
+                    return newState;
+                }
+
+                key = (key || '').split(/\./g);
+
+                let k, t = newState;
+                while (k = key.shift()) {
+
+                    if (key.length === 0) {
+
+                        t[k] = value
+                        break;
+                    }
+
+                    if (typeof t[k] === 'undefined') {
+                        t[k] = {};
+                    }
+
+                    t = t[k];
+                }
+
+                // log('after', newState)
+
+                return newState;
+
+            }, () => resolve(this.state)))
+            render() {
+
+                log('redner', this.state)
+                return (
+                    <form action="/generate" method="post" onSubmit={this.onSubmit} ref={e => (this.form = e)}>
+                        <label>
+                            <input type="text" name="url" style={{width:'98%'}} />
+                        </label>
+                        <br/>
+                        <label>
+                            scale:
+                            <input type="input" value={this.state.pdf.scale} onChange={e => this.change('pdf.scale', e.target.value )} />
+                        </label>
+                        <br/>
+                        <label>
+                            displayHeaderFooter:
+                            <input type="checkbox" checked={this.state.pdf.displayHeaderFooter || false} onChange={e => this.change('pdf.displayHeaderFooter', e.target.checked)}
+                            />
+                        </label>
+                        {this.state.pdf.displayHeaderFooter && (
+                            <Fragment>
+                                <br/>
+                                <label>
+                                    footerTemplate:
+                                    <br/>
+                                    <textarea value={this.state.pdf.footerTemplate} onChange={e => this.change('pdf.footerTemplate', e.target.value)}
+                                              style={{minHeight: '20px', width: '98%'}}
+                                    />
+                                </label>
+                                <br/>
+                                <label>
+                                    headerTemplate:
+                                    <br/>
+                                    <textarea value={this.state.pdf.headerTemplate} onChange={e => this.change('pdf.headerTemplate', e.target.value)}
+                                              style={{minHeight: '20px', width: '98%'}}
+                                    />
+                                </label>
+                            </Fragment>
+                        )}
+                        <input type="hidden" name="json" value={JSON.stringify(this.state)}/>
+                        <br />
+                        <input type="submit" value="generate pdf" />
+                    </form>
+                );
+            }
+        }
+
+        ReactDOM.render(
+            <Root />,
+            document.getElementById('root')
+        );
+    </script>
+
+    see source code...
+
+    <script>
+
+        // g(Minimal HTML Template) https://reactjs.org/docs/try-react.html#minimal-html-template
+        //
+        // /this project /doc/syntax.png
+
+    </script>
 </body>
 </html>
