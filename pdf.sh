@@ -1,6 +1,8 @@
 
 set -e
 
+STDIN=$(cat -)
+
 URL=$1
 
 TMPFILE="pdf.pdf"
@@ -72,6 +74,7 @@ export SCRIPT=$(cat <<END
 docker run \
     --env P_URL="$URL" \
     --env P_TMPFILE="$TMPFILE" \
+    --env P_JSON="$STDIN" \
     -t \
     --rm \
     --cap-add=SYS_ADMIN \

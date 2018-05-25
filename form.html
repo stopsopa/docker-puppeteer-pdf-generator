@@ -123,6 +123,27 @@
                                 </label>
                             </Fragment>
                         )}
+                        <br/>
+                        <label>
+                            margin top:
+                            <input type="input" value={this.state.pdf.margin.top} onChange={e => this.change('pdf.margin.top', e.target.value )} />
+                        </label>
+                        <br/>
+                        <label>
+                            margin bottom:
+                            <input type="input" value={this.state.pdf.margin.bottom} onChange={e => this.change('pdf.margin.bottom', e.target.value )} />
+                        </label>
+                        <br/>
+                        <label>
+                            margin left:
+                            <input type="input" value={this.state.pdf.margin.left} onChange={e => this.change('pdf.margin.left', e.target.value )} />
+                        </label>
+                        <br/>
+                        <label>
+                            margin right:
+                            <input type="input" value={this.state.pdf.margin.right} onChange={e => this.change('pdf.margin.right', e.target.value )} />
+                        </label>
+                        <br/>
                         <input type="hidden" name="json" value={JSON.stringify(this.state)}/>
                         <br />
                         <input type="submit" value="generate pdf" />

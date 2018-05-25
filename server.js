@@ -43,7 +43,9 @@ const parserParams = query => {
                 key     = a.shift(),
                 dec     = a.join('=')
             ;
-            acc[key] = decodeURIComponent(dec);
+
+            acc[key] = decodeURIComponent(dec).replace(/\+/g, ' ');
+
             return acc;
         }, {});
     }
@@ -217,8 +219,53 @@ var type = (function (types) {
 
 const handler = (req, res, next) => {
 
-    getRawBody(req)
-    .then(function (buf) {
+    const pathname = (function () {
+        return req.url.split('?')[0];
+    }());
+
+    if (/^\/js\//.test(pathname)) {
+
+        var file = path.resolve(__dirname, '.' + path.sep + (decodeURI(pathname).replace(/\.\.+/g, '.')));
+
+        if (fs.existsSync(file)) {
+
+            try {
+
+                next();
+
+                return res.end(fs.readFileSync(file), type(req, res));
+            }
+            catch (e) {
+
+                next();
+
+                return res.end('No access to file... ' + file);
+            }
+        }
+    }
+
+    // http://localhost:7777/pdf-generator-check
+    if (pathname === '/infinity') {
+
+        return next();
+    }
+
+    // http://localhost:7777/pdf-generator-check
+    if (pathname === '/pdf-generator-check') {
+
+        res.end('ok');
+
+        return next();
+    }
+
+    if (pathname === '/favicon.ico') {
+
+        res.end('no favicon');
+
+        return next();
+    }
+
+    getRawBody(req).then(function (buf) {
 
         let parsed;
 
@@ -250,6 +297,9 @@ const handler = (req, res, next) => {
             // but at the end I'm combining this to format that is visible in try higher
 
             parsed = parserParams(buf.toString());
+
+            ll('parsed')
+            ll(parsed)
 
             if (parsed.json && typeof parsed.json == 'string') {
 
@@ -284,52 +334,6 @@ const handler = (req, res, next) => {
         //         "scale": 0.7
         //     }
         // }
-
-        const pathname = (function () {
-            return req.url.split('?')[0];
-        }());
-
-        if (/^\/js\//.test(pathname)) {
-
-            var file = path.resolve(__dirname, '.' + path.sep + (decodeURI(pathname).replace(/\.\.+/g, '.')));
-
-            if (fs.existsSync(file)) {
-
-                try {
-
-                    next();
-
-                    return res.end(fs.readFileSync(file), type(req, res));
-                }
-                catch (e) {
-
-                    next();
-
-                    return res.end('No access to file... ' + file);
-                }
-            }
-        }
-
-        // http://localhost:7777/pdf-generator-check
-        if (pathname === '/infinity') {
-
-            return next();
-        }
-
-        // http://localhost:7777/pdf-generator-check
-        if (pathname === '/pdf-generator-check') {
-
-            res.end('ok');
-
-            return next();
-        }
-
-        if (pathname === '/favicon.ico') {
-
-            res.end('no favicon');
-
-            return next();
-        }
 
         var credentials = auth(req);
 
@@ -419,7 +423,31 @@ const handler = (req, res, next) => {
                 });
             }
 
-            const cmd = `/bin/bash pdf.sh "${purl}"`;
+            const json = (function ({ url, launch, pdf }) {
+
+                const filteredLaunch = {};
+
+                if (launch.timeout) {
+
+                    filteredLaunch.timeout = launch.timeout;
+                }
+
+                const config = JSON.stringify({
+                    url,
+                    pdf,
+                    launch: filteredLaunch
+                });
+
+                tlog(`config: '${config}'`);
+
+                // https://stackoverflow.com/a/6182519/5560682
+                return Buffer.from(config).toString('base64');
+
+            }(parsed));
+
+            const cmd = `printf '${json}' | /bin/bash pdf.sh "${purl}"`;
+
+            tlog(`cmd: '${cmd}'`);
 
             try {
 
