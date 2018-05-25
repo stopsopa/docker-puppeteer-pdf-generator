@@ -426,7 +426,7 @@ const handler = (req, res, next) => {
 
                 const filteredLaunch = {};
 
-                if (launch.timeout) {
+                if (launch && launch.timeout) {
 
                     filteredLaunch.timeout = launch.timeout;
                 }
