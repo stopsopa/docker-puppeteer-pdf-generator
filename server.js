@@ -77,7 +77,7 @@ var tlog = (function () {
                 (new Date()).toISOString().substring(0, 19).replace('T', ' '),
                 ': ',
                 ...args,
-                "\n"
+                "\n\n"
             ];
 
             process.stdout.write(args.join(''));
@@ -298,8 +298,8 @@ const handler = (req, res, next) => {
 
             parsed = parserParams(buf.toString());
 
-            ll('parsed')
-            ll(parsed)
+            // ll('parsed')
+            // ll(parsed)
 
             if (parsed.json && typeof parsed.json == 'string') {
 
@@ -307,10 +307,9 @@ const handler = (req, res, next) => {
 
                     parsed.json = JSON.parse(parsed.json);
 
-                    parsed = {
-                        url: parsed.url,
-                        ...parsed.json
-                    }
+                    parsed = Object.assign({}, {
+                        url: parsed.url
+                    }, parsed.json);
                 }
                 catch (e) {
 
