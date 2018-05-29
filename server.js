@@ -67,7 +67,9 @@ const fs = require('fs');
 
 const path = require('path');
 
-var getRawBody = require('raw-body')
+const slug = require('slug');
+
+var getRawBody = require('raw-body');
 
 var tlog = (function () {
     try {
@@ -216,6 +218,8 @@ var type = (function (types) {
     pdf     : 'application/pdf',
     ico     : 'image/x-icon',
 }))));
+
+const file = path.join(__dirname, 'pdf.pdf');
 
 const handler = (req, res, next) => {
 
