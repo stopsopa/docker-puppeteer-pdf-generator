@@ -67,9 +67,7 @@ const fs = require('fs');
 
 const path = require('path');
 
-const slug = require('slug');
-
-var getRawBody = require('raw-body');
+var getRawBody = require('raw-body')
 
 var tlog = (function () {
     try {
@@ -218,8 +216,6 @@ var type = (function (types) {
     pdf     : 'application/pdf',
     ico     : 'image/x-icon',
 }))));
-
-const file = path.join(__dirname, 'pdf.pdf');
 
 const handler = (req, res, next) => {
 
@@ -485,15 +481,22 @@ const handler = (req, res, next) => {
 
                 tlog('attempt to return file: ' + file + ' from server');
 
-                const stream = fs.createReadStream(file);
                 const stat = fs.statSync(file);
+                
                 res.setHeader('Content-Length', stat.size);
+                // const stream = fs.createReadStream(file);
                 res.setHeader('Content-Type', 'application/pdf');
 
                 // force browser to download
                 // res.setHeader('Content-Disposition', 'attachment; filename=quote.pdf');
 
-                stream.pipe(res);
+                // stream.pipe(res);
+
+                const binary = fs.readFileSync(file, "binary")
+
+                res.write(binary, "binary");
+
+                res.end();
 
                 purl = false;
 

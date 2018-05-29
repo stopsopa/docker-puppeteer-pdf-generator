@@ -67,7 +67,14 @@ const timeout = 15000;
             process.exit(1);
         });
 
-        await page.goto(process.env.P_URL, {waitUntil: 'networkidle2'});
+        await page.goto(process.env.P_URL, {waitUntil: [
+                'load',
+                'domcontentloaded',
+                'networkidle0',
+                'networkidle2',
+        ]});
+
+        await new Promise(resolve => setTimeout(resolve, 300));
 
         // https://github.com/GoogleChrome/puppeteer/issues/666#issuecomment-326796411
         // await page.pdf({
