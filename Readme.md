@@ -40,7 +40,7 @@ Just visit:
     
 # Puppeteer in Docker:
     
-[https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker](Running puppeteer in Docker)       
+[Running puppeteer in Docker](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker)       
     
 # Ping:
     
