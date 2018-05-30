@@ -25,6 +25,16 @@
 
         log('config', config);
 
+        const headerTemplate = `<div style="font-size: 6px; width: 100%; padding-left: 30px; padding-right: 30px;">
+    <div class="title" style="color: darkgray;"></div>
+    <div class="url"></div>
+</div>`;
+
+        const footerTemplate = `<div style="font-size: 6px; width: 100%; padding-left: 30px; padding-right: 30px;">
+    <span class="date" style="float:left;"></span>
+    <span style="float:right;">page: <span class="pageNumber"></span> / <span class="totalPages"></span></span>
+</div>`;
+
         const {
             Fragment
         } = React;
@@ -34,7 +44,7 @@
 
                 super(...args);
 
-                this.state = config;
+                this.state = {...config, url: 'https://stopsopa.github.io/docker-puppeteer-pdf-generator/example.html'};
 
                 // log('state', this.state);
             }
@@ -79,18 +89,32 @@
                     t = t[k];
                 }
 
-                // log('after', newState)
+                if (newState && newState.pdf) {
+
+                    newState.pdf || (newState.pdf = {});
+
+                    if (!newState.pdf.headerTemplate) {
+
+                        delete newState.pdf.headerTemplate;
+                    }
+
+                    if (!newState.pdf.footerTemplate) {
+
+                        delete newState.pdf.footerTemplate;
+                    }
+                }
 
                 return newState;
 
             }, () => resolve(this.state)))
             render() {
 
-                log('redner', this.state)
+                log('render', this.state, JSON.stringify(this.state, null, 4));
+
                 return (
                     <form action="/generate" method="post" onSubmit={this.onSubmit} ref={e => (this.form = e)}>
                         <label>
-                            <input type="text" name="url" style={{width:'98%'}} />
+                            <input type="text" name="url" style={{width:'98%'}} value={this.state.url} onChange={e => this.change('url', e.target.value )}/>
                         </label>
                         <br/>
                         <label>
@@ -104,46 +128,77 @@
                             />
                         </label>
                         {this.state.pdf.displayHeaderFooter && (
-                            <Fragment>
-                                <br/>
-                                <label>
-                                    footerTemplate:
-                                    <br/>
-                                    <textarea value={this.state.pdf.footerTemplate} onChange={e => this.change('pdf.footerTemplate', e.target.value)}
-                                              style={{minHeight: '20px', width: '98%'}}
-                                    />
-                                </label>
-                                <br/>
-                                <label>
-                                    headerTemplate:
-                                    <br/>
-                                    <textarea value={this.state.pdf.headerTemplate} onChange={e => this.change('pdf.headerTemplate', e.target.value)}
-                                              style={{minHeight: '20px', width: '98%'}}
-                                    />
-                                </label>
-                            </Fragment>
+    <table width="95%">
+        <tbody>
+        <tr>
+            <td>
+                <label>
+                    headerTemplate:
+                    <br/>
+                    <textarea value={this.state.pdf.headerTemplate} onChange={e => this.change('pdf.headerTemplate', e.target.value)}
+                              style={{minHeight: '100px', width: '98%'}}
+                    />
+                </label>
+            </td>
+            <td width="100">
+                <button type="button" onClick={() => this.change('pdf.headerTemplate', headerTemplate )}>example</button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>
+                    footerTemplate:
+                    <br/>
+                    <textarea value={this.state.pdf.footerTemplate} onChange={e => this.change('pdf.footerTemplate', e.target.value)}
+                              style={{minHeight: '100px', width: '98%'}}
+                    />
+                </label>
+            </td>
+            <td>
+                <button type="button" onClick={() => this.change('pdf.footerTemplate', footerTemplate )}>example</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
                         )}
-                        <br/>
-                        <label>
-                            margin top:
-                            <input type="input" value={this.state.pdf.margin.top} onChange={e => this.change('pdf.margin.top', e.target.value )} />
-                        </label>
-                        <br/>
-                        <label>
-                            margin bottom:
-                            <input type="input" value={this.state.pdf.margin.bottom} onChange={e => this.change('pdf.margin.bottom', e.target.value )} />
-                        </label>
-                        <br/>
-                        <label>
-                            margin left:
-                            <input type="input" value={this.state.pdf.margin.left} onChange={e => this.change('pdf.margin.left', e.target.value )} />
-                        </label>
-                        <br/>
-                        <label>
-                            margin right:
-                            <input type="input" value={this.state.pdf.margin.right} onChange={e => this.change('pdf.margin.right', e.target.value )} />
-                        </label>
-                        <br/>
+
+
+                        <table width="95%">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <label>
+                                        margin top:
+                                        <input type="input" value={this.state.pdf.margin.top} onChange={e => this.change('pdf.margin.top', e.target.value )} />
+                                    </label>
+                                    <br/>
+                                    <label>
+                                        margin bottom:
+                                        <input type="input" value={this.state.pdf.margin.bottom} onChange={e => this.change('pdf.margin.bottom', e.target.value )} />
+                                    </label>
+                                    <br/>
+                                    <label>
+                                        margin left:
+                                        <input type="input" value={this.state.pdf.margin.left} onChange={e => this.change('pdf.margin.left', e.target.value )} />
+                                    </label>
+                                    <br/>
+                                    <label>
+                                        margin right:
+                                        <input type="input" value={this.state.pdf.margin.right} onChange={e => this.change('pdf.margin.right', e.target.value )} />
+                                    </label>
+                                </td>
+                                <td>
+                                    <button type="button" onClick={() => { // quite ugly, but that's just demo
+                                        this.change('pdf.margin.top', 45 )
+                                        this.change('pdf.margin.bottom', 45 )
+                                        this.change('pdf.margin.left', 45 )
+                                        this.change('pdf.margin.right', 45 )
+                                    }}>example</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
                         <input type="hidden" name="json" value={JSON.stringify(this.state)}/>
                         <br />
                         <input type="submit" value="generate pdf" />
@@ -164,7 +219,7 @@
 
         // g(Minimal HTML Template) https://reactjs.org/docs/try-react.html#minimal-html-template
         //
-        // /this project /doc/syntax.png
+        // /this project /docs/syntax.png
 
     </script>
 </body>

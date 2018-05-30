@@ -3,6 +3,9 @@
 In this repository there are two versions available. One with Google Chrome another with Chromium.
 For more information see [releases](https://github.com/stopsopa/docker-puppeteer-pdf-generator/releases)
 
+I had to have Google Chrome because footerTemplate and headerTemplate options of command page.pdf(options) didn't worked in chromium. see 
+[page.pdf(options) doc page](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions)
+
 
 # Installation:
 
