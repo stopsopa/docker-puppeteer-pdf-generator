@@ -7,7 +7,7 @@ URL=$1
 
 TMPFILE="pdf.pdf"
 
-DOCKERIMAGE="puppeteer-alpine-generate-pdf"
+DOCKERIMAGE="puppeteer-chrome-linux"
 
 if [ $# -lt 1 ] ; then
 
@@ -83,6 +83,12 @@ docker run \
     node -e "\$(cat script.js)" 2>&1
 END
 );
+
+printf "\n"
+
+echo $SCRIPT;
+
+printf "\n"
 
 set +e
 OUTPUT=$(eval $SCRIPT 2>&1);

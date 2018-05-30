@@ -31,7 +31,13 @@ const timeout = 15000;
             '--no-sandbox',
             '--disable-setuid-sandbox'
         ],
-        executablePath: '/usr/bin/chromium-browser',
+
+        // without this will continue to use the bundled version of Chromium that Puppeteer installs
+        // from: https://github.com/GoogleChrome/puppeteer/issues/379#issuecomment-328572755
+        // executablePath: '/usr/bin/chromium-browser', // chromium
+        executablePath: '/usr/bin/google-chrome-unstable', // google chrome
+
+
         timeout
     });
 
