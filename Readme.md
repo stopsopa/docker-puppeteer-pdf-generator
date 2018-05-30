@@ -1,4 +1,4 @@
-# Version:
+# Versions:
     
 In this repository there are two versions available. One with Google Chrome another with Chromium.
 For more information see [releases](https://github.com/stopsopa/docker-puppeteer-pdf-generator/releases)
