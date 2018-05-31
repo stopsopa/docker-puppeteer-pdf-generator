@@ -5,9 +5,7 @@ STDIN=$(cat -)
 
 URL=$1
 
-TMPFILE="pdf.pdf"
-
-DOCKERIMAGE="puppeteer-chrome-linux"
+source config.sh
 
 if [ $# -lt 1 ] ; then
 
@@ -51,22 +49,22 @@ else
     exit 1;
 fi
 
-export SCRIPT=$(cat <<END
-docker build -t $DOCKERIMAGE . 2>&1
-END
-);
+# export SCRIPT=$(cat <<END
+# docker build -t $DOCKERIMAGE . 2>&1
+# END
+# );
 
-set +e
-OUTPUT=$(eval $SCRIPT 2>&1);
-STATUS="$?"
-set -e
+# set +e
+# OUTPUT=$(eval $SCRIPT 2>&1);
+# STATUS="$?"
+# set -e
 
-if [ "$STATUS" != "0" ]; then
-
-    echo -e "for url: 'build process failed code:$STATUS\nstdout:>>>>$OUTPUT<<<\n\n"
-
-    exit 1
-fi
+# if [ "$STATUS" != "0" ]; then
+#
+#     echo -e "for url: 'build process failed code:$STATUS\nstdout:>>>>$OUTPUT<<<\n\n"
+#
+#     exit 1
+# fi
 
 rm -rf $TMPFILE;
 
@@ -105,6 +103,8 @@ fi
 if [ ! -f $TMPFILE ]; then
 
     echo "file '$TMPFILE' was not created for url '$URL'"
+
+    echo "OUTPUT: >>>$OUTPUT<<<"
     
     exit 1
 fi

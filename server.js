@@ -418,7 +418,7 @@ const handler = (req, res, next) => {
                 purl = false;
 
                 return jsonResponse({
-                    error: `given url parameter (${query.url}) is not valid URL`
+                    error: `given url parameter (${purl}) is not valid URL`
                 });
             }
 
@@ -470,11 +470,13 @@ const handler = (req, res, next) => {
 
                 tlog(`executing command '${cmd}' failed, exit code: '${sel.code}'`)
 
+                const ret = jsonResponse({
+                    error: `processing url '${purl}' failed`
+                });
+
                 purl = false;
 
-                return jsonResponse({
-                    error: `processing url '${query.url}' failed`
-                });
+                return ret;
             }
 
             if (fs.existsSync(file)) {

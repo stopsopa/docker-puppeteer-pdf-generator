@@ -6,3 +6,6 @@ stop:
 
 status:
 	/bin/bash server-is-working.sh  pdf-generator-service-executed-by-make && echo 'working' || echo 'not working'
+
+build:
+	/bin/bash build.sh

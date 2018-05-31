@@ -18,6 +18,7 @@ I had to have Google Chrome because footerTemplate and headerTemplate options of
     
     # manually change password in config.js for basic auth
     
+    make build
     node server.js --port 7777
     
 
