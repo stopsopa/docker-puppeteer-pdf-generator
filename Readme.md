@@ -9,16 +9,13 @@ I had to have Google Chrome because footerTemplate and headerTemplate options of
 
 # Installation:
 
-    mkdir node-pdf
-    cd node-pdf
-    git clone git@github.com:stopsopa/docker-puppeteer-pdf-generator.git .
+    git clone this repository and go to main directory
     yarn
-    docker build -t puppeteer-alpine-generate-pdf .
+    make build
     cp config.js.dist config.js
     
     # manually change password in config.js for basic auth
     
-    make build
     node server.js --port 7777
     
 
