@@ -1,4 +1,4 @@
 
 TMPFILE="pdf.pdf"
 
-DOCKERIMAGE="puppeteer-chrome-linux"
+DOCKERIMAGE="slootsantos/puppeteer-chrome-linux"

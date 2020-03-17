@@ -54,7 +54,7 @@ Just visit:
         $ Chromium 64.0.3282.168
         
     or if you follow node:8-slim : https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-in-docker
-        docker run -it --rm --cap-add=SYS_ADMIN --rm puppeteer-chrome-linux /usr/bin/google-chrome-unstable --version
+        docker run -it --rm --cap-add=SYS_ADMIN --rm slootsantos/puppeteer-chrome-linux /usr/bin/google-chrome-unstable --version
             Google Chrome 68.0.3438.3 dev
         
     on mac:

@@ -11,6 +11,10 @@ const shelljs   = require('shelljs');
 
 const config    = require('./config');
 
+const trim = require('nlab/trim');
+
+const log = require('inspc');
+
 (function () {
     let error = false;
     try {
@@ -57,8 +61,6 @@ const parserParams = query => {
 };
 
 const auth      = require('basic-auth');
-
-var log = (function(){try{return console.log}catch(e){return function(){}}}());
 
 // const sync = require('child_process').execSync;
 const sync = require('child_process').spawnSync;
@@ -269,6 +271,8 @@ const handler = (req, res, next) => {
 
         let parsed;
 
+        let raw = trim(buf.toString(), '"');
+
         try {
 
             // expecting here: {
@@ -287,7 +291,7 @@ const handler = (req, res, next) => {
             //         "scale": 0.7
             //     }
             // }
-            parsed = JSON.parse(buf.toString());
+            parsed = JSON.parse(raw);
         }
         catch (e) {
 
@@ -296,7 +300,7 @@ const handler = (req, res, next) => {
             // post form field "url" and separately "json"
             // but at the end I'm combining this to format that is visible in try higher
 
-            parsed = parserParams(buf.toString());
+            parsed = parserParams(raw);
 
             // ll('parsed')
             // ll(parsed)
@@ -459,8 +463,8 @@ const handler = (req, res, next) => {
                 purl = false;
 
                 return jsonResponse({
-                    error: 'innerCatch',
-                    exception: e.toString()
+                    error       : 'innerCatch',
+                    exception   : e.toString()
                 });
             }
 

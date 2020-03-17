@@ -3,3 +3,5 @@ node_modules
 *.pdf
 /test_____/
 /config.js
+yarn-error.log
+.env

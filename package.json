@@ -1,6 +1,10 @@
 {
   "dependencies": {
     "basic-auth": "^2.0.0",
+    "dotenv-up": "^1.0.30",
+    "inspc": "^0.0.18",
+    "js-base64": "^2.5.2",
+    "nlab": "^0.0.77",
     "raw-body": "^2.3.3",
     "shelljs": "^0.8.2"
   }
