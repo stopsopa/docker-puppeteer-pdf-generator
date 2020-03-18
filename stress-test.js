@@ -77,8 +77,6 @@ content = content.split("\n").map(a => trim(a)).filter(Boolean).filter(a => reg.
 
 const next = (function (c) {
 
-    const l = c.length;
-
     let i = -1;
 
     return () => {
@@ -94,7 +92,7 @@ const next = (function (c) {
     }
 }(content));
 
-const maxconcurrent = 1;
+const maxconcurrent = 3;
 
 let buff = [];
 
