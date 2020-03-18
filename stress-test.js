@@ -119,7 +119,7 @@ const run = async target => {
         })
     }
 
-    process.stdout.write('-')
+    process.stdout.write('-');
 
     buff = buff.filter(u => u !== target);
 
