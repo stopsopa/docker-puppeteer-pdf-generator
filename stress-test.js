@@ -4,11 +4,17 @@ require('dotenv-up')({
     deep        : 1,
 }, true, 'tests');
 
+const fs = require('fs');
+
+const path = require('path');
+
 const querystring   = require('querystring');
 
 const log = require('inspc');
 
 const delay = require('nlab/delay');
+
+const trim = require('nlab/trim');
 
 const pdfgen = require('./lib/pdf-generator');
 
@@ -20,9 +26,25 @@ pdfgen.setup({
     pass        : process.env.PROTECTED_PDF_GENERATOR_BASIC_PASS,
     timeoutms   : 20 * 1000,
     dir         : '/Users/sd/Workspace/projects/pdf-generater/runtime/pdfs-generated',
+    // urlgenerate : url => {
+    //
+    //     const p = sha256(url).split(/^(.)(.*)$/).splice(1,2);
+    //
+    //     p[1] += '.pdf';
+    //
+    //     return {
+    //         url,
+    //         subdir: p[0],
+    //         filename: p[1],
+    //     };
+    // },
     urlgenerate : url => {
 
-        const p = sha256(url).split(/^(.)(.*)$/).splice(1,2);
+        const r = decodeURIComponent(decodeURIComponent(url));
+
+        const slug = r.split('?')[0].split('/').pop();
+
+        const p = slug.split(/^(.)(.*)$/).splice(1,2);
 
         p[1] += '.pdf';
 
@@ -40,30 +62,57 @@ const basicheader = Base64.encode(`${process.env.PROTECTED_PDF_GENERATOR_BASIC_U
 
 const target = 'https://stopsopa.github.io/docker-puppeteer-pdf-generator/example.html'
 
+const file = path.resolve(__dirname, 'stress-test.txt');
+
+if ( ! fs.existsSync(file) ) { // warning: if under dirfile there will be broken link (pointing to something nonexisting) then this function will return false even if link DO EXIST but it's broken
+
+    throw new Error(`file '${file}' doesn't exists`);
+}
+
+let content = fs.readFileSync(file, 'utf8').toString();
+
+const reg = /^https?:\/\//
+
+content = content.split("\n").map(a => trim(a)).filter(Boolean).filter(a => reg.test(a));
+
+const next = (function (c) {
+
+    const l = c.length;
+
+    let i = -1;
+
+    return () => {
+
+        i += 1;
+
+        if ( ! content[i] ) {
+
+            i = 0;
+        }
+
+        return content[i];
+    }
+}(content));
+
+const maxconcurrent = 1;
+
+let buff = [];
+
 const run = async target => {
 
     try {
-        // {
-        //     "launch": {},
-        //     "pdf": {
-        //         "displayHeaderFooter": true,
-        //             "format": "A4",
-        //             "margin": {
-        //             "top": "0",
-        //                 "right": "0",
-        //                 "bottom": "0",
-        //                 "left": "0"
-        //         },
-        //         "scale": 0.7
-        //     },
-        //     "url": "https://stopsopa.github.io/docker-puppeteer-pdf-generator/example.html"
-        // }
+
+        console.log("");
+        process.stdout.write('buff: ');
+        buff.forEach(n => {
+            process.stdout.write(String(content.indexOf(n) + 1) + ' ');
+        });
 
         const data = await pdfgen(null, target);
 
-        log.dump({
-            data,
-        }, 20)
+        // log.dump({
+        //     data,
+        // }, 20)
     }
     catch (e) {
 
@@ -72,9 +121,35 @@ const run = async target => {
         })
     }
 
-    // await delay(1000);
+    process.stdout.write('-')
 
-    // run(target);
+    buff = buff.filter(u => u !== target);
+
+    trigger();
 };
 
-run(target);
+function trigger() {
+
+    for ( let i = 0, l = content.length ; i < l ; i += 1 ) {
+
+        if (buff.length >= maxconcurrent) {
+
+            break;
+        }
+
+        const n = next();
+
+        if (buff.find(b => b === n)) {
+
+            break;
+        }
+
+        process.stdout.write('+')
+
+        buff.push(n);
+
+        run(n);
+    }
+}
+
+trigger();

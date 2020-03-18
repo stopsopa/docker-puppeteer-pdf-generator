@@ -9,3 +9,6 @@ status:
 
 build:
 	/bin/bash build.sh
+
+watch:
+	watch -n 0.3 gls -lAR --time-style=full-iso pdfs-generated
