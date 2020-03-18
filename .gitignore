@@ -5,3 +5,5 @@ node_modules
 /config.js
 yarn-error.log
 .env
+/pdfs-generated
+*.swp

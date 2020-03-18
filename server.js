@@ -498,11 +498,35 @@ const handler = (req, res, next) => {
 
                 // stream.pipe(res);
 
-                const binary = fs.readFileSync(file, "binary")
 
-                res.write(binary, "binary");
+                        // var readStream = fs.createReadStream(file);
+                        //
+                        // // This will wait until we know the readable stream is actually valid before piping
+                        // readStream.on('open', function () {
+                        //     // This just pipes the read stream to the response object (which goes to the client)
+                        //     readStream.pipe(res);
+                        // });
 
-                res.end();
+                const stream = fs.createReadStream(file);
+
+                stream.pipe(res);
+
+                // return fs.readFile(file, (err, data) => {
+                //
+                //     if (err) throw err;
+                //
+                //     res.end(data);
+                // });
+
+                // const binary = fs.readFileSync(file, "binary");
+                //
+                // res.write(binary, "binary");
+
+                // log.dump({
+                //     all: 'good',
+                // })
+
+                // res.end();
 
                 purl = false;
 
