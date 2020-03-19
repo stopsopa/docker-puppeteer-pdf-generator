@@ -164,7 +164,7 @@ const run = async target => {
             }
         });
 
-        if (data.state !== 'not-expired') {
+        if (data.mode !== 'not-expired') {
 
             log.dump({
                 stress_test_file_generated: data,
