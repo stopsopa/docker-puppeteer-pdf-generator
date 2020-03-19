@@ -267,6 +267,13 @@ const handler = (req, res, next) => {
         return next();
     }
 
+    function end(msg) {
+
+        log(msg);
+
+        log(`\n    ^^ end request ^^ ` + req.url);
+    }
+
     getRawBody(req).then(function (buf) {
 
         let parsed;
@@ -371,6 +378,8 @@ const handler = (req, res, next) => {
 
             res.end(`The only endpoint handled is <a href="/generate">/generate</a>`);
 
+            end(`The only endpoint handled is <a href="/generate">/generate</a>`);
+
             return next();
         }
         // purl = false;
@@ -382,6 +391,8 @@ const handler = (req, res, next) => {
             if ( purl ) {
 
                 tlog(req.url + ' : server busy');
+
+                end(`server is currently processing: ${purl}`);
 
                 return jsonResponse({
                     error: `server is currently processing: ${purl}`
@@ -410,6 +421,8 @@ const handler = (req, res, next) => {
 
                 res.end(html);
 
+                end(`next`);
+
                 return next();
             }
 
@@ -420,6 +433,8 @@ const handler = (req, res, next) => {
                 tlog(purl + ' : url is not valid');
 
                 purl = false;
+
+                end(`url is not https?://`);
 
                 return jsonResponse({
                     error: `given url parameter (${purl}) is not valid URL`
@@ -462,6 +477,8 @@ const handler = (req, res, next) => {
 
                 purl = false;
 
+                end(`command error, exception: ${e}`)
+
                 return jsonResponse({
                     error       : 'innerCatch',
                     exception   : e.toString()
@@ -479,6 +496,8 @@ const handler = (req, res, next) => {
                 });
 
                 purl = false;
+
+                end(`returned status code failed, code: '${sel.code}'`);
 
                 return ret;
             }
@@ -530,6 +549,8 @@ const handler = (req, res, next) => {
 
                 purl = false;
 
+                end(`file exist`);
+
                 return setTimeout(next, 0);
             }
             else {
@@ -549,12 +570,12 @@ const handler = (req, res, next) => {
         }
 
         purl = false;
-
-
     })
-    .catch(function (err) {
+    .catch(function (e) {
         res.statusCode = 500
-        res.end(err.message)
+        res.end(e.message)
+
+        end(`general exception: ${e}`)
     });
 };
 
