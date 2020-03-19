@@ -12,3 +12,6 @@ build:
 
 watch:
 	watch -n 0.3 gls -lAR --time-style=full-iso pdfs-generated
+
+http:
+	node standalone.js --port 666

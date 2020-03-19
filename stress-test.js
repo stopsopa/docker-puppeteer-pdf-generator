@@ -20,25 +20,67 @@ const pdfgen = require('./lib/pdf-generator');
 
 const sha256 = require('nlab/sha256');
 
+const dir = path.resolve(__dirname, 'pdfs-generated');
+
+const fakedb = (function () {
+
+    const file = path.resolve(__dirname, 'fakedb.json');
+
+    function getall(deletefile = false) {
+
+        let obj = {};
+
+        if (fs.existsSync(file)) { // warning: if under dirfile there will be broken link (pointing to something nonexisting) then this function will return false even if link DO EXIST but it's broken
+
+            try {
+
+                obj = JSON.parse(fs.readFileSync(file, 'utf8').toString());
+            }
+            catch (e) {
+
+                log.dump({
+                    json_parse_file: file,
+                    error: e
+                });
+            }
+
+            deletefile && fs.unlinkSync(file);
+        }
+
+        return obj;
+    }
+
+    return {
+        get: url => {
+
+            const obj = getall();
+
+            if ( ! url ) {
+
+                return obj;
+            }
+
+            return obj[url];
+        },
+        set: async (url, data) => {
+
+            const obj = getall();
+
+            obj[url] = data;
+
+            fs.writeFileSync(file, JSON.stringify(obj, null, 4));
+        }
+    };
+}());
+
 pdfgen.setup({
-    server      : process.env.PROTECTED_PDF_GENERATOR_ENDPOINT,
-    user        : process.env.PROTECTED_PDF_GENERATOR_BASIC_USER,
-    pass        : process.env.PROTECTED_PDF_GENERATOR_BASIC_PASS,
-    timeoutms   : 20 * 1000,
-    dir         : '/Users/sd/Workspace/projects/pdf-generater/runtime/pdfs-generated',
-    // urlgenerate : url => {
-    //
-    //     const p = sha256(url).split(/^(.)(.*)$/).splice(1,2);
-    //
-    //     p[1] += '.pdf';
-    //
-    //     return {
-    //         url,
-    //         subdir: p[0],
-    //         filename: p[1],
-    //     };
-    // },
-    urlgenerate : url => {
+    server              : process.env.PROTECTED_PDF_GENERATOR_ENDPOINT,
+    user                : process.env.PROTECTED_PDF_GENERATOR_BASIC_USER,
+    pass                : process.env.PROTECTED_PDF_GENERATOR_BASIC_PASS,
+    timeoutms           : 20 * 1000,
+    time_tolerance_sec  : 3,
+    dir,
+    urlgenerate         : url => {
 
         const r = decodeURIComponent(decodeURIComponent(url));
 
@@ -55,12 +97,6 @@ pdfgen.setup({
         };
     },
 });
-
-const Base64 = require('js-base64').Base64;
-
-const basicheader = Base64.encode(`${process.env.PROTECTED_PDF_GENERATOR_BASIC_USER}:${process.env.PROTECTED_PDF_GENERATOR_BASIC_PASS}`);
-
-const target = 'https://stopsopa.github.io/docker-puppeteer-pdf-generator/example.html'
 
 const file = path.resolve(__dirname, 'stress-test.txt');
 
@@ -106,16 +142,39 @@ const run = async target => {
             process.stdout.write(String(content.indexOf(n) + 1) + ' ');
         });
 
-        const data = await pdfgen(null, target);
+        const data = await pdfgen({
+            last_db_mtime_sec_utc: (function (db = {}) {
 
-        // log.dump({
-        //     data,
-        // }, 20)
+                const utc = db.mtime || (new Date()).toISOString();
+
+                return parseInt(parseInt((new Date(utc)).getTime(), 10) / 1000, 10);
+
+            }(fakedb.get(target))),
+            urlgenerateargs: [
+                target
+            ],
+            debugfn: data => {
+
+                const {
+                    url,
+                    ...rest
+                } = data;
+
+                fakedb.set(url, rest);
+            }
+        });
+
+        if (data.state !== 'not-expired') {
+
+            log.dump({
+                stress_return_error: data,
+            }, 20)
+        }
     }
     catch (e) {
 
         log.dump({
-            error: e,
+            stress_general_error: e,
         })
     }
 
@@ -123,7 +182,9 @@ const run = async target => {
 
     buff = buff.filter(u => u !== target);
 
-    trigger();
+    // await delay(500);
+
+    // trigger();
 };
 
 function trigger() {
