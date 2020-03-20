@@ -164,12 +164,12 @@ const run = async target => {
             }
         });
 
-        if (data.mode !== 'not-expired') {
+        // if (data.mode !== 'not-expired') {
 
             log.dump({
                 stress_test_file_generated: data,
             }, 20)
-        }
+        // }
     }
     catch (e) {
 
