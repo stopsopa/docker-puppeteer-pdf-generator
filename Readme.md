@@ -1,7 +1,7 @@
 # DEPRECATED
 Created in 2018 - quite old now and not maintained.
 
-I wouldn't suggest using. I'm sure there are better solution today.
+I wouldn't suggest using it. I'm sure there are better solutions today.
 
 # Versions:
     
