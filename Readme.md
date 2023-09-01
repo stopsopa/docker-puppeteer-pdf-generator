@@ -1,3 +1,8 @@
+# DEPRECATED
+Created in 2018 - quite old now and not maintained.
+
+I wouldn't suggest using. I'm sure there are better solution today.
+
 # Versions:
     
 In this repository there are two versions available. One with Google Chrome another with Chromium.
